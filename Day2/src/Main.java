@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         List<String> lines = Files.readAllLines(Path.of("./Day2/src/input"));
 
-        //Part 1
+        //Part 1 & 2
         List<Integer> ids = new ArrayList<>();
         lines.forEach(line -> {
                     String[] arrayLine = line.split(": ");
@@ -20,6 +20,9 @@ public class Main {
                     String[] sets = setsString.split("; ");
 
                     boolean isValid = true;
+                    int maxRed = 0;
+                    int maxGreen = 0;
+                    int maxBlue = 0;
                     for (int i = 0; i < sets.length; ++i) {
                         String[] set = sets[i].split(", ");
                         for (int j = 0; j < set.length; ++j) {
@@ -28,29 +31,27 @@ public class Main {
                             String color = x[1];
                             switch (color) {
                                 case "blue" : {
-                                    if (number > 14) {
-                                        isValid = false;
+                                    if (maxBlue < number) {
+                                        maxBlue = number;
                                     }
                                     break;
                                 }
                                 case "red" : {
-                                    if (number > 12) {
-                                        isValid = false;
+                                    if (maxRed < number) {
+                                        maxRed = number;
                                     }
                                     break;
                                 }
                                 case "green" : {
-                                    if (number > 13) {
-                                        isValid = false;
+                                    if (maxGreen < number) {
+                                        maxGreen = number;
                                     }
                                     break;
                                 }
                             }
                         }
                     }
-                    if (isValid) {
-                        ids.add(id);
-                    }
+                    ids.add(maxRed * maxBlue * maxGreen);
                 });
 
 
