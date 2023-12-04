@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 public class Card {
     private final Set<Integer> winningNumbers;
     private final Set<Integer> myNumbers;
-
+    private int numberOfCopies;
     private int points;
 
     public Card(String line) {
@@ -35,9 +35,14 @@ public class Card {
             }
         }
         this.points = p == 0 ? 0 : (int) Math.pow(2, p - 1);
+        this.numberOfCopies = p;
     }
 
     public int getPoints() {
         return points;
+    }
+
+    public int getNumberOfCopies() {
+        return numberOfCopies;
     }
 }
