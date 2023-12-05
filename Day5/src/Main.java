@@ -4,9 +4,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalLong;
+
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Main {
@@ -40,8 +39,6 @@ public class Main {
         for (int i = 2; i < input.size(); ++i) {
             String line = input.get(i);
             if (line.isEmpty()) { //Before every Map is one empty line
-                nameToMap = null;
-                srcDest = null;
                 functions.add(new SourceToDestination(initValues, source, destination));
                 initValues = new ArrayList<>();
             } else if (line.matches("\\D+")) { //Line with the header of map
@@ -118,21 +115,6 @@ public class Main {
                 .min(Long::compareTo);
 
         System.out.println(min.get());
-
-
-/*
-        long minLoc = Long.MAX_VALUE;
-        for (int i = 0; i < seedRanges.size(); ++i) {
-            Seed currentSeed = seedRanges.get(i);
-            for (long j = currentSeed.start; j < currentSeed.start + currentSeed.range; ++j) {
-                Long seed = j;
-                Long loc = fromSeedToLoc.apply(seed);
-                minLoc = loc < minLoc ? loc : minLoc;
-            }
-        }
-
-        System.out.println(minLoc);
-        */
     }
 
     public static void main(String[] args) throws IOException {
