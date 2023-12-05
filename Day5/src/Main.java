@@ -3,6 +3,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
     private static void readSeeds(String[] seedsFromFile, List<Long> seeds) {
@@ -81,8 +86,58 @@ public class Main {
 
         System.out.println(minLoc);
     }
+
+    private static void readSeedsPartTwo(String[] seedsFromFile, List<Seed> seeds) {
+        for (int i = 1; i <= seedsFromFile.length - 1; i += 2) {
+            Seed seed = new Seed(Long.parseLong(seedsFromFile[i]), Long.parseLong(seedsFromFile[i + 1]));
+            seeds.add(seed);
+        }
+    }
+
+    public static void secondPart(List<String> input) {
+        //Read all Seeds from File and save in "seeds"
+        List<Seed> seedRanges = new ArrayList<>();
+        String firstLineWithSeeds = input.get(0);
+        readSeedsPartTwo(firstLineWithSeeds.split(" "), seedRanges);
+
+        //Read all maps from file
+        List<SourceToDestination> functions = new ArrayList<>();
+        readMaps(input, functions);
+
+        Function<Long, Long> fromSeedToLoc = y -> {
+            for (int i = 0; i < functions.size(); ++i) {
+                y = functions.get(i).apply(y);
+            }
+            return y;
+        };
+
+        Optional<Long> min = seedRanges
+                .parallelStream()
+                .map(seed -> Stream.iterate(seed.start, x -> x + 1).limit(seed.range))
+                .map(streamOfSeeds -> streamOfSeeds.map(fromSeedToLoc).min(Long::compareTo).get())
+                .min(Long::compareTo);
+
+        System.out.println(min.get());
+
+
+/*
+        long minLoc = Long.MAX_VALUE;
+        for (int i = 0; i < seedRanges.size(); ++i) {
+            Seed currentSeed = seedRanges.get(i);
+            for (long j = currentSeed.start; j < currentSeed.start + currentSeed.range; ++j) {
+                Long seed = j;
+                Long loc = fromSeedToLoc.apply(seed);
+                minLoc = loc < minLoc ? loc : minLoc;
+            }
+        }
+
+        System.out.println(minLoc);
+        */
+    }
+
     public static void main(String[] args) throws IOException {
         List<String> lines = Files.readAllLines(Path.of("./Day5/src/input"));
         firstPart(lines);
+        secondPart(lines);
     }
 }
