@@ -1,18 +1,18 @@
 public class Race {
 
-    private int time;
-    private int distance;
+    private long time;
+    private long distance;
 
-    public Race(int time, int distance) {
+    public Race(long time, long distance) {
         this.time = time;
         this.distance = distance;
     }
 
-    public int getDistance() {
+    public long getDistance() {
         return distance;
     }
 
-    public int getTime() {
+    public long getTime() {
         return time;
     }
 }
