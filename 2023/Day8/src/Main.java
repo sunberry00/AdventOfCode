@@ -23,8 +23,8 @@ public class Main {
         BiFunction<String, String, String> getNext = (node, direction)  -> network.get(node).getNext(direction);
 
         while(!start.equals("ZZZ")) {
-            for (int i = 0; i < instructions.size(); ++i) {
-                start = getNext.apply(start, instructions.get(i));
+            for (String instruction : instructions) {
+                start = getNext.apply(start, instruction);
                 steps++;
                 if (start.equals("ZZZ")) {
                     break;
@@ -60,12 +60,10 @@ public class Main {
 
         Function<String, Long> getNumberOfNexts = getStringLongFunction(network, instructions);
 
-        Set<String> nextNodes = Set.copyOf(startNodes);
-
         long result = startNodes
                 .stream()
-                        .mapToLong(getNumberOfNexts::apply)
-                                .reduce(1, (x, y) -> (x * y) / ggT(x, y));
+                .mapToLong(getNumberOfNexts::apply)
+                .reduce(1, (x, y) -> (x * y) / ggT(x, y));
 
         System.out.println(result);
 
@@ -74,11 +72,11 @@ public class Main {
     private static Function<String, Long> getStringLongFunction(Map<String, Node> network, List<String> instructions) {
         BiFunction<String, String, String> getNextNode = (node, direction)  -> network.get(node).getNext(direction);
 
-        Function<String, Long> getNumberOfNexts = node -> {
+        return node -> {
             long steps = 0;
             while(node.charAt(2) != 'Z') {
-                for (int i = 0; i < instructions.size(); ++i) {
-                    node = getNextNode.apply(node, instructions.get(i));
+                for (String instruction : instructions) {
+                    node = getNextNode.apply(node, instruction);
                     steps++;
                     if (node.charAt(2) == 'Z') {
                         break;
@@ -87,7 +85,6 @@ public class Main {
             }
             return steps;
         };
-        return getNumberOfNexts;
     }
 
     public static void main(String[] args) throws IOException {
