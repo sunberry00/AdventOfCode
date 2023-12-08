@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Main {
@@ -33,8 +34,61 @@ public class Main {
         }
         System.out.println(steps);
     }
+
+    public static long ggT(long a, long b) {
+        while (b != 0) {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    public static void secondPart(List<String> input) {
+        List<String> instructions = Arrays.stream(input.getFirst().split("")).toList();
+        Map<String, Node> network = new TreeMap<>();
+
+        input.stream().skip(2).forEach(item -> {
+            String[] inp = item.split(" ");
+            network.put(inp[0], new Node(inp[2] + inp[3]));
+        });
+
+        Set<String> startNodes =
+                network.keySet()
+                .stream()
+                .filter(item -> item.charAt(2) == 'A')
+                .collect(Collectors.toSet());
+
+        BiFunction<String, String, String> getNextNode = (node, direction)  -> network.get(node).getNext(direction);
+
+        Function<String, Long> getNumberOfNexts = node -> {
+            long steps = 0;
+            while(node.charAt(2) != 'Z') {
+                for (int i = 0; i < instructions.size(); ++i) {
+                    node = getNextNode.apply(node, instructions.get(i));
+                    steps++;
+                    if (node.charAt(2) == 'Z') {
+                        break;
+                    }
+                }
+            }
+            return steps;
+        };
+
+        Set<String> nextNodes = Set.copyOf(startNodes);
+
+        long result = startNodes
+                .stream()
+                        .mapToLong(getNumberOfNexts::apply)
+                                .reduce(1, (x, y) -> (x * y) / ggT(x, y));
+
+        System.out.println(result);
+
+    }
+
     public static void main(String[] args) throws IOException {
         List<String> lines = Files.readAllLines(Path.of("./Day8/src/input"));
-        firstPart(lines);
+        //firstPart(lines);
+        secondPart(lines);
     }
 }
