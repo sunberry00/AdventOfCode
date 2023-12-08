@@ -5,7 +5,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Main {
 
@@ -59,6 +58,20 @@ public class Main {
                 .filter(item -> item.charAt(2) == 'A')
                 .collect(Collectors.toSet());
 
+        Function<String, Long> getNumberOfNexts = getStringLongFunction(network, instructions);
+
+        Set<String> nextNodes = Set.copyOf(startNodes);
+
+        long result = startNodes
+                .stream()
+                        .mapToLong(getNumberOfNexts::apply)
+                                .reduce(1, (x, y) -> (x * y) / ggT(x, y));
+
+        System.out.println(result);
+
+    }
+
+    private static Function<String, Long> getStringLongFunction(Map<String, Node> network, List<String> instructions) {
         BiFunction<String, String, String> getNextNode = (node, direction)  -> network.get(node).getNext(direction);
 
         Function<String, Long> getNumberOfNexts = node -> {
@@ -74,16 +87,7 @@ public class Main {
             }
             return steps;
         };
-
-        Set<String> nextNodes = Set.copyOf(startNodes);
-
-        long result = startNodes
-                .stream()
-                        .mapToLong(getNumberOfNexts::apply)
-                                .reduce(1, (x, y) -> (x * y) / ggT(x, y));
-
-        System.out.println(result);
-
+        return getNumberOfNexts;
     }
 
     public static void main(String[] args) throws IOException {
