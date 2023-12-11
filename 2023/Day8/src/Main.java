@@ -88,7 +88,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        List<String> lines = Files.readAllLines(Path.of("./Day8/src/input"));
+        List<String> lines = Files.readAllLines(Path.of("./2023/Day8/src/input"));
         //firstPart(lines);
         secondPart(lines);
     }
