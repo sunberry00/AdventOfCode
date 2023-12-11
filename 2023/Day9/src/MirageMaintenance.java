@@ -39,8 +39,39 @@ public class MirageMaintenance {
         System.out.println(sum);
     }
 
+    public static void secondPart(List<String> input) {
+        List<List<Integer>> sequences = new ArrayList<>();
+        for (String line : input) {
+            String[] numbers = line.split(" ");
+            sequences.add(new ArrayList<>());
+            Arrays.stream(numbers).forEach(item -> sequences.get(sequences.size() - 1).add(Integer.parseInt(item)));
+        }
+
+        Predicate<List<Integer>> allZeros = x -> x.stream().anyMatch(item -> item != 0);
+
+        long sum = 0;
+        for (List<Integer> sequence : sequences) {
+            List<List<Integer>> differences = new ArrayList<>(); //List of differences
+            List<Integer> currentSequence = List.copyOf(sequence); //Start Sequence
+            do {
+                differences.add(new ArrayList<>());
+                for (int i = 0; i < currentSequence.size() - 1; ++i) {
+                    differences.getLast().add(currentSequence.get(i + 1) - currentSequence.get(i));
+                }
+                currentSequence = List.copyOf(differences.getLast());
+            } while (allZeros.test(differences.getLast()));
+            for (int i = differences.size() - 1; i > 0; --i) {
+                int intToAdd = differences.get(i - 1).getFirst() - differences.get(i).getFirst();
+                differences.get(i - 1).addFirst(intToAdd);
+            }
+            sum += sequence.getFirst() - differences.getFirst().getFirst();
+        }
+        System.out.println(sum);
+    }
+
     public static void main(String[] args) throws IOException {
         List<String> lines = Files.readAllLines(Path.of("./2023/Day9/src/input"));
-        firstPart(lines);
+        //firstPart(lines);
+        secondPart(lines);
     }
 }
