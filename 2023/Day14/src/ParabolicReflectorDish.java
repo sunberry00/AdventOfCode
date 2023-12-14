@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,16 @@ public class ParabolicReflectorDish {
         }
     }
 
+    public static String reverseSortBlock(String block) {
+        if (block.indexOf('#') == -1) {
+            int numberRocks = (int) Arrays.stream(block.split("")).filter(x -> x.equals("O")).count();
+            int numberEmptySpaces = (int) Arrays.stream(block.split("")).filter(x -> x.equals(".")).count();
+            return ".".repeat(numberEmptySpaces) + "O".repeat(numberRocks);
+        } else {
+            return block;
+        }
+    }
+
     public static void firstPart(List<String> lines) {
         List<String> flippedPuzzle = Puzzle.flipPuzzle(lines);
 
@@ -80,11 +91,67 @@ public class ParabolicReflectorDish {
             sum += (numberRocks * (result.size() - i));
         }
         System.out.println(sum);
+    }
+
+    public static void secondPart(List<String> lines) {
+
+        HashMap<Long, Long> table = new HashMap<>();
+
+        long sum = 0;
+        for (long n = 0; n < 1000L; ++n) {
+
+            List<String> flippedPuzzle = Puzzle.flipPuzzle(lines);
+
+            List<String> northPuzzle = flippedPuzzle.parallelStream()
+                    .map(line -> splitByBlocks(line)
+                            .parallelStream()
+                            .map(ParabolicReflectorDish::sortBlock)
+                            .collect(Collectors.joining()))
+                    .toList();
+
+            flippedPuzzle = Puzzle.flipPuzzle(northPuzzle);
+
+            List<String> westPuzzle = flippedPuzzle.parallelStream()
+                    .map(line -> splitByBlocks(line)
+                            .parallelStream()
+                            .map(ParabolicReflectorDish::sortBlock)
+                            .collect(Collectors.joining()))
+                    .toList();
+
+            flippedPuzzle = Puzzle.flipPuzzle(westPuzzle);
+
+            List<String> southPuzzle = flippedPuzzle.parallelStream()
+                    .map(line -> splitByBlocks(line)
+                            .parallelStream()
+                            .map(ParabolicReflectorDish::reverseSortBlock)
+                            .collect(Collectors.joining()))
+                    .toList();
+
+            flippedPuzzle = Puzzle.flipPuzzle(southPuzzle);
+
+            lines = flippedPuzzle.parallelStream()
+                    .map(line -> splitByBlocks(line)
+                            .parallelStream()
+                            .map(ParabolicReflectorDish::reverseSortBlock)
+                            .collect(Collectors.joining()))
+                    .toList();
+
+            sum = 0;
+            for (int i = 0; i < lines.size(); ++i) {
+                String currentLine = lines.get(i);
+                long numberRocks = Arrays.stream(currentLine.split("")).filter(x -> x.equals("O")).count();
+                sum += (numberRocks * (lines.size() - i));
+            }
+            table.put(n, sum);
+        }
+
+        System.out.println(sum);
 
     }
 
     public static void main(String[] args) throws IOException {
         List<String> lines = Files.readAllLines(Path.of("./2023/Day14/input"));
-        firstPart(lines);
+        //firstPart(lines);
+        secondPart(lines);
     }
 }
