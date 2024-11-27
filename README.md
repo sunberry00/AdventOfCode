@@ -1,5 +1,5 @@
-# AdventOfCode23
-Advent of Code 23
-https://adventofcode.com/2023
+# AdventOfCode
+Advent of Code
+https://adventofcode.com
 
-My first attempt in Advent of Code.
+My solutions for Advent of Code
