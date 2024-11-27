@@ -24,7 +24,7 @@ public class Main {
         return str;
     }
     public static void main(String[] args) throws IOException {
-        List<String> lines = Files.readAllLines(Path.of("./Day1/src/input"));
+        List<String> lines = Files.readAllLines(Path.of("2023/Day1/src/input"));
 
         //Part 1
         long firstPart = lines.stream()

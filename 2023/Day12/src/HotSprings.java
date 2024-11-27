@@ -9,7 +9,7 @@ import java.util.List;
 public class HotSprings {
 
     public record Spring(String map, List<Integer> groups) {}
-    public record Key(int currentIndex, int currentGroup, int sizeOfBlocks) {}
+
     public static List<Integer> fromStringToGroups(String[] strAmounts) {
         return Arrays.stream(strAmounts).map(Integer::valueOf).toList();
     }
@@ -35,43 +35,11 @@ public class HotSprings {
         return true;
     }
 
-    public static long getNumberOfArrangements(Spring spring) {
-        return getNumberOfArrangements(spring.map(), spring.groups(), new HashMap<>(), 0, 0, 0);
-    }
-
-    public static long getNumberOfArrangements(String repr, List<Integer> groups, HashMap<Key, Long> memo, int currentIndex, int currentGroup, int sizeOfBlocks) {
-        Key key = new Key(currentIndex, currentGroup, sizeOfBlocks);
-        if (memo.containsKey(key)) {
-            return memo.get(key);
-        }
-        if (currentIndex == repr.length()) {
-            if (currentGroup == groups.size() && sizeOfBlocks == 0) {
-                return 1;
-            } else if (currentGroup == groups.size() - 1 && groups.get(currentGroup) == sizeOfBlocks) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-
-        long numberOfArrangements = 0;
-        char[] possibilities = {'.', '#'};
-        for (char c : possibilities) {
-            if (repr.charAt(currentIndex) == c || repr.charAt(currentIndex) == '?') {
-                if (c == '.' && sizeOfBlocks == 0) {
-                    numberOfArrangements += getNumberOfArrangements(repr, groups, memo, currentIndex + 1, currentGroup, 0);
-                } else if (c == '.' && sizeOfBlocks > 0 && currentGroup < groups.size() && groups.get(currentGroup) == sizeOfBlocks) {
-                    numberOfArrangements += getNumberOfArrangements(repr, groups, memo, currentIndex + 1, currentGroup + 1, 0);
-                } else if (c == '#') {
-                    numberOfArrangements += getNumberOfArrangements(repr, groups, memo, currentIndex + 1, currentGroup, sizeOfBlocks + 1);
-                }
-            }
-        }
-        memo.put(key, numberOfArrangements);
-        return numberOfArrangements;
-    }
-
     public static long numberOfArrangements(Spring spring) {
+        return numberOfArrangements(spring, new HashMap<>());
+    }
+
+    public static long numberOfArrangements(Spring spring, HashMap<Spring, Long> memo) {
         if (spring.map().indexOf('?') == -1) {
             if (isRightArrangement(spring.map(), spring.groups())) {
                 return 1;
@@ -80,13 +48,18 @@ public class HotSprings {
             }
         }
 
-        long y = numberOfArrangements(new Spring(spring.map().replaceFirst("\\?", "."), spring.groups()))
-                + numberOfArrangements(new Spring(spring.map().replaceFirst("\\?", "#"), spring.groups()));
+        if (memo.containsKey(spring)) {
+            return memo.get(spring);
+        }
+
+        long y = numberOfArrangements(new Spring(spring.map().replaceFirst("\\?", "."), spring.groups()), memo)
+                + numberOfArrangements(new Spring(spring.map().replaceFirst("\\?", "#"), spring.groups()), memo);
+        memo.put(spring, y);
         return y;
     }
 
     public static void main(String[] args) throws IOException {
-        List<String> lines = Files.readAllLines(Path.of("./2023/Day12/input"));
+        List<String> lines = Files.readAllLines(Path.of("./2023/Day12/example"));
 
         List<Spring> hotSprings = lines.parallelStream()
                 .map(line -> new Spring(
@@ -94,12 +67,9 @@ public class HotSprings {
                         fromStringToGroupsPartTwo(line.split(" ")[1].split(","))))
                 .toList();
 
-        //Part 1
         System.out.println(hotSprings
                 .parallelStream()
-                .mapToLong(HotSprings::getNumberOfArrangements)
+                .mapToLong(HotSprings::numberOfArrangements)
                 .sum());
-
-
     }
 }
