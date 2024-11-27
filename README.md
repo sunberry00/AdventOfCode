@@ -1,4 +1,4 @@
-# AdventOfCode23
+# AdventOfCode
 Advent of Code
 https://adventofcode.com
 
